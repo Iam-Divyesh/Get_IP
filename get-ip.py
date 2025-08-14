@@ -1,24 +1,26 @@
-import socket
+import geocoder
 from flask import Flask, request, jsonify
-
 
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def index():
-      return jsonify({"status": "ok", "message": "HeadsIn API is running"})
-    
+    return jsonify({"status": "ok", "message": "HeadsIn API is running"})
 
-@app.route('/get-ip', methods=['GET'])
+@app.route("/get-ip", methods=["GET"])
 def get_ip():
-    host_name = socket.gethostname()
+    # Get the client's IP address from request headers
+    client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    
+    # Get location details using geocoder
+    g = geocoder.ip(client_ip)
+    
+    return jsonify({
+        "ip": client_ip,
+        "city": g.city,
+        "country": g.country,
+        "latlng": g.latlng
+    })
 
-    ip_address = socket.gethostbyname(host_name)
-
-    print(host_name)
-    print(ip_address)
-
-    return jsonify({'ip': ip_address, 'hostname': host_name})
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
