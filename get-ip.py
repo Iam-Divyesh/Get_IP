@@ -2,6 +2,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({"status": "ok", "message": "HeadsIn API is running", "timestamp": datetime.now().isoformat()})
+
 @app.route("/get-ip", methods=["GET"])
 def get_ip():
     # Check if behind a proxy/load balancer
